@@ -1,71 +1,71 @@
-# AeroBeat Spatial UI Adapter Template
+# AeroBeat Spatial UI XR
 
-This is the official template for creating a **spatial UI adapter** repository within the AeroBeat ecosystem.
+`aerobeat-spatial-ui-xr` is the AeroBeat repo for the **XR-driven spatial UI provider** lane.
 
-A spatial UI adapter turns host-driven world, projected, or hybrid pointer detection into AeroBeat's shared UI interaction contract. Use this template for concrete adapter repos such as desktop mouse, touch, or XR providers that publish into the canonical contract owned by `aerobeat-input-core`.
+This repository is currently an **XR bootstrap/boundary package**. It no longer represents the generic spatial adapter template; instead it establishes the honest package identity, ownership line, placeholder runtime surface, and repo-local validation needed before real XR provider extraction begins.
 
-This template stays intentionally bounded:
+The current slice is intentionally narrow:
 
-- `aerobeat-input-core` remains the canonical owner of the UI interaction contract and bus.
-- `aerobeat-spatial-ui-core` remains the shared helper layer for spatial provider infrastructure, including packaged resolver/projection seams reused by concrete providers.
-- Repos created from this template should implement one concrete spatial provider lane, not redefine the contract and not absorb shared helper ownership.
-- Consumer repos should compose packaged providers and helpers; they should not become the long-term home of provider-local fallback ownership or cross-provider glue.
-- Native 2D bridge work belongs in `aerobeat-input-core`, not in repos generated from this template.
+- **included now:** XR-lane package identity, boundary docs, inert provider/config/runtime/manifest scaffolding, and test guards for dependency truth
+- **still deferred:** real XR lifecycle publication, pointer continuity behavior, controller/rig integration, world-hit acquisition, and installed-addon proof-host adoption
 
-## Post-Phase-3 architecture status
+## Current status
 
-This repository now includes the minimum scaffolding needed to template the post-Phase-3 ownership boundary correctly.
+This repository now contains:
 
-That currently means:
+- explicit XR provider-lane scaffolding under `src/providers/xr/`
+- docs that pin `aerobeat-input-core` as the canonical UI interaction contract owner
+- docs and placeholder runtime metadata that pin `aerobeat-spatial-ui-core` as the shared spatial helper-layer owner
+- bootstrap truth for the planned XR source variants `xr_ray` and `xr_direct`
+- repo-local validation that guards against drift back into template identity or forbidden ownership
 
-- placeholder runtime/configuration classes under `src/template/`
-- a boundary note in `docs/phase-1-boundary-freeze.md`
-- tests that pin `aerobeat-input-core` as the contract owner
-- tests and docs that pin `aerobeat-spatial-ui-core` as the shared packaged helper-layer owner
-- inert template metadata that tells downstream repos to keep concrete provider behavior in their own lane
-- explicit guidance that touch and XR work should grow into separate provider repos instead of consumer-repo glue
+This bootstrap repo is intentionally **not** the XR provider implementation yet. Its job in this phase is to freeze the repo boundary so future extraction work can land without reopening package ownership questions.
 
-Current non-goals for this template:
+## Planned responsibility boundary
 
-- no concrete adapter runtime behavior here
-- no canonical interaction contract definitions here
-- no native 2D bridge logic here
-- no shared cross-provider helper ownership here
-- no provider-local projected-target fallback ownership here
-- no consumer-repo proof-host glue ownership here
-- no direct extraction of proof-scene behavior into the template
+`aerobeat-spatial-ui-xr` is intended to own XR-specific spatial UI provider behavior such as:
 
-## 📋 Repository Details
+- XR pointer lifecycle/runtime state
+- XR interaction-mode normalization for `xr_ray` and `xr_direct`
+- provider-owned continuity/cancel policy for XR-driven world/projected UI interactions
+- provider-readable runtime diagnostics for downstream proof and QA flows
+- composition into the canonical interaction contract already owned by `aerobeat-input-core`
 
-- **Type:** Spatial UI Adapter Template
-- **License:** **Mozilla Public License 2.0 (MPL 2.0)**
-- **Current baseline dependencies:**
-  - `aerobeat-input-core` (canonical UI interaction contract)
-  - `aerobeat-spatial-ui-core` (shared spatial provider helpers)
-  - `gut` (repo-local validation)
-- **Template scaffolding:**
-  - `src/template/` (placeholder runtime/configuration surface for downstream concrete adapters)
-  - `docs/phase-1-boundary-freeze.md` (repo boundary contract)
-- **Intended downstream examples:**
-  - `aerobeat-spatial-ui-mouse`
-  - future `aerobeat-spatial-ui-touch`
-  - future `aerobeat-spatial-ui-xr`
+It is **not** intended to become:
 
-## Provider-lane guidance for downstream repos
+- a second contract-definition repo
+- the owner of the canonical interaction taxonomy or `XrUiInputAdapter`
+- the home of the native 2D bridge path
+- the owner of shared cross-provider spatial helpers
+- the owner of scene-specific XR rig setup or proof-host world-hit acquisition
+- a place to silently re-home consumer/proof composition glue
 
-Repos created from this template should stay narrow and truthful:
+## Repository details
 
-- a mouse repo owns mouse-specific spatial lifecycle behavior
-- a touch repo owns touch-specific spatial lifecycle behavior
-- an XR repo owns XR-specific spatial lifecycle behavior
-- shared resolver/projection/helper ownership stays packaged in `aerobeat-spatial-ui-core`
-- the canonical interaction contract stays in `aerobeat-input-core`
+- **Type:** Spatial UI provider bootstrap
+- **License:** Mozilla Public License 2.0 (MPL 2.0)
+- **Dependency truth:**
+  - `aerobeat-input-core` owns the canonical UI interaction contract
+  - `aerobeat-spatial-ui-core` owns shared spatial-provider helper scaffolding
+  - `gut` drives repo-local validation
 
-If a consumer/proof repo still needs temporary world-hit composition, compatibility wrappers, or experiment-specific scene glue, keep that as consumer-side composition until it is ready to move into a dedicated provider lane. Do not normalize that glue back into a generated adapter repo.
+## Runtime files
+
+The current bootstrap surface lives under:
+
+- `src/providers/xr/aero_spatial_ui_xr_provider.gd`
+- `src/providers/xr/aero_spatial_ui_xr_provider_config.gd`
+- `src/providers/xr/aero_spatial_ui_xr_runtime_boundary.gd`
+- `src/providers/xr/aero_spatial_ui_xr_manifest.gd`
+
+Key repo-local docs:
+
+- `docs/phase-1-boundary-freeze.md`
+- `docs/phase-2-xr-packet-stack.md`
 
 ## GodotEnv development flow
 
-This repo uses the AeroBeat GodotEnv package convention.
+This repo follows the AeroBeat GodotEnv package convention.
 
 - Canonical dev/test manifest: `.testbed/addons.jsonc`
 - Installed dev/test addons: `.testbed/addons/`
@@ -73,7 +73,7 @@ This repo uses the AeroBeat GodotEnv package convention.
 - Hidden workbench project: `.testbed/project.godot`
 - Repo-local unit tests: `.testbed/tests/`
 
-The repo root remains the package/published boundary for downstream consumers. Day-to-day development, debugging, and validation happen from the hidden `.testbed/` workbench using the pinned OpenClaw toolchain: Godot `4.6.2 stable standard`.
+The repo root remains the package boundary for downstream consumers. Direct development, smoke checks, and unit validation happen from the hidden `.testbed/` workbench.
 
 ### Restore dev/test dependencies
 
@@ -84,8 +84,6 @@ cd .testbed
 godotenv addons install
 ```
 
-That restores this repo's current dev/test manifest into `.testbed/addons/`.
-
 ### Open the workbench
 
 From the repo root:
@@ -93,8 +91,6 @@ From the repo root:
 ```bash
 godot --editor --path .testbed
 ```
-
-Use this `.testbed/` project as the canonical direct-development and bugfinding surface for spatial adapter work.
 
 ### Import smoke check
 
@@ -115,12 +111,10 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
   -gexit
 ```
 
-### Validation notes
+## Validation notes
 
-- `.testbed/addons.jsonc` is the committed dev/test dependency contract.
-- The current template baseline pins the canonical UI interaction contract, the shared spatial helper layer, and GUT.
-- Repo-local unit tests live under `.testbed/tests/`.
-- The current package shape is consumed from the repo root (`subfolder: "/"`) for downstream installs.
-- `src/template/` exists only to template the ownership boundary; it is not a real adapter implementation.
-- Repos created from this template should publish concrete spatial-provider behavior without expanding into new contract ownership.
-- Repos created from this template should inherit the packaged helper/provider split directly instead of reintroducing provider-local fallback seams in consumer repos.
+- `.testbed/addons.jsonc` is the committed dev/test dependency manifest.
+- `docs/phase-1-boundary-freeze.md` records the frozen ownership line for the XR lane.
+- `docs/phase-2-xr-packet-stack.md` records the bootstrap, extraction, and semantic packet truth for future implementation work.
+- The current XR lane remains **bootstrap-only** and should continue to report XR verification truth as `unverified` until real runtime/device validation exists upstream.
+- Consumer/proof hosts must continue owning scene-specific XR rig wiring and world-hit acquisition until a later extraction slice moves only the provider-owned XR lifecycle/runtime lane into this package.

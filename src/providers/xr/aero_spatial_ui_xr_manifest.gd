@@ -1,28 +1,30 @@
 @tool
 extends RefCounted
-class_name AeroSpatialUiAdapterTemplateManifest
+class_name AeroSpatialUiXrManifest
 
-const REPO_ROLE := "template_for_concrete_spatial_adapters"
+const REPO_ROLE := "xr_provider_bootstrap"
+const PROVIDER_LANE := "xr"
 const CONTRACT_OWNER_PACKAGE := "aerobeat-input-core"
 const SHARED_HELPER_OWNER_PACKAGE := "aerobeat-spatial-ui-core"
-const PROVIDER_LANE_EXAMPLES := [
-	"aerobeat-spatial-ui-mouse",
-	"aerobeat-spatial-ui-touch",
-	"aerobeat-spatial-ui-xr",
+const SUPPORTED_SOURCE_VARIANTS := [
+	"xr_ray",
+	"xr_direct",
 ]
 
 static func ownership_summary() -> Dictionary:
 	return {
 		"repo_role": REPO_ROLE,
+		"provider_lane": PROVIDER_LANE,
 		"contract_owner_package": CONTRACT_OWNER_PACKAGE,
 		"shared_helper_owner_package": SHARED_HELPER_OWNER_PACKAGE,
-		"provider_lane_examples": PROVIDER_LANE_EXAMPLES,
+		"supported_source_variants": SUPPORTED_SOURCE_VARIANTS,
 		"requires_packaged_shared_helpers": true,
-		"expects_separate_provider_lanes": true,
-		"ships_concrete_runtime_behavior": false,
+		"requires_consumer_world_hit_acquisition": true,
+		"ships_runtime_behavior": false,
+		"verification_status_default": "unverified",
 		"owns_contract_definition": false,
 		"owns_native_2d_bridge": false,
 		"owns_shared_helper_layer": false,
-		"owns_provider_local_fallbacks": false,
-		"owns_consumer_repo_glue": false,
+		"owns_scene_specific_xr_rig": false,
+		"owns_world_hit_acquisition": false,
 	}

@@ -2,7 +2,7 @@ config_version=5
 
 [application]
 
-config/name="AeroBeat Spatial UI Template Testbed"
+config/name="AeroBeat Spatial UI XR Testbed"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [editor_plugins]

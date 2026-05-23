@@ -1,19 +1,19 @@
 {
   "$schema": "https://chickensoft.games/schemas/addons.schema.json",
   "addons": {
-    // Canonical shared UI interaction contract for AeroBeat spatial adapter repos.
+    // Canonical shared UI interaction contract for the XR provider lane bootstrap.
     "aerobeat-input-core": {
       "url": "git@github.com:AeroBeat-Workouts/aerobeat-input-core.git",
       "checkout": "v0.1.0",
       "subfolder": "/"
     },
-    // Shared helper layer for world/projected spatial UI providers.
+    // Shared helper layer consumed by concrete spatial provider repos, including XR.
     "aerobeat-spatial-ui-core": {
       "url": "git@github.com:AeroBeat-Workouts/aerobeat-spatial-ui-core.git",
       "checkout": "main",
       "subfolder": "/"
     },
-    // GUT drives the repo-local test suite inside the hidden testbed/workbench.
+    // GUT drives the repo-local bootstrap test suite inside the hidden testbed/workbench.
     "gut": {
       "url": "git@github.com:bitwes/Gut.git",
       "checkout": "main",
