@@ -2,47 +2,46 @@
 
 `aerobeat-spatial-ui-xr` is the AeroBeat repo for the **XR-driven spatial UI provider** lane.
 
-This repository is currently an **XR bootstrap/boundary package**. It no longer represents the generic spatial adapter template; instead it establishes the honest package identity, ownership line, placeholder runtime surface, and repo-local validation needed before real XR provider extraction begins.
-
-The current slice is intentionally narrow:
-
-- **included now:** XR-lane package identity, boundary docs, inert provider/config/runtime/manifest scaffolding, and test guards for dependency truth
-- **still deferred:** real XR lifecycle publication, pointer continuity behavior, controller/rig integration, world-hit acquisition, and installed-addon proof-host adoption
+This package now owns the first truthful extracted slice of reusable XR lifecycle/runtime behavior for projected and world-space UI surfaces. The repo keeps XR pointer continuity, source-variant normalization/locking, off-surface release continuation, cancel policy, and provider runtime diagnostics local to this package while leaving XR rig wiring, world-hit acquisition, and proof-scene composition outside the repo.
 
 ## Current status
 
 This repository now contains:
 
-- explicit XR provider-lane scaffolding under `src/providers/xr/`
-- docs that pin `aerobeat-input-core` as the canonical UI interaction contract owner
-- docs and placeholder runtime metadata that pin `aerobeat-spatial-ui-core` as the shared spatial helper-layer owner
-- bootstrap truth for the planned XR source variants `xr_ray` and `xr_direct`
-- repo-local validation that guards against drift back into template identity or forbidden ownership
+- concrete XR provider runtime behavior under `src/providers/xr/`
+- boundary docs that freeze repo ownership for XR lifecycle/runtime semantics only
+- package/runtime manifests that pin dependency and non-goal truth
+- provider-local semantic tests for press/release, drag ordering, cancel handling, runtime state, and dependency boundaries
+- a `.testbed/` workbench manifest that points at the canonical contract and shared helper owners
 
-This bootstrap repo is intentionally **not** the XR provider implementation yet. Its job in this phase is to freeze the repo boundary so future extraction work can land without reopening package ownership questions.
+The current implementation is intentionally narrow:
+
+- **included now:** XR lifecycle/runtime semantics, source-variant stability (`xr_ray` / `xr_direct`), owner continuity, off-surface release continuation, cancel publication policy, provider runtime diagnostics, and packaged shared-helper composition
+- **still intentionally excluded:** XR rig wiring, world-hit acquisition, proof-host composition/debug UI, canonical contract ownership, and shared helper ownership changes
 
 ## Planned responsibility boundary
 
-`aerobeat-spatial-ui-xr` is intended to own XR-specific spatial UI provider behavior such as:
+`aerobeat-spatial-ui-xr` owns reusable XR-specific spatial UI provider behavior such as:
 
-- XR pointer lifecycle/runtime state
-- XR interaction-mode normalization for `xr_ray` and `xr_direct`
-- provider-owned continuity/cancel policy for XR-driven world/projected UI interactions
-- provider-readable runtime diagnostics for downstream proof and QA flows
-- composition into the canonical interaction contract already owned by `aerobeat-input-core`
+- XR pointer runtime state for projected/world-space UI surfaces
+- press/drag/release owner continuity for XR interaction
+- source-variant normalization and continuity for `xr_ray` and `xr_direct`
+- off-surface continuation using prior projected state when continuity exists
+- cancel publication reserved for interrupted continuity
+- provider-local runtime diagnostics for XR semantics
 
 It is **not** intended to become:
 
 - a second contract-definition repo
-- the owner of the canonical interaction taxonomy or `XrUiInputAdapter`
+- the owner of the canonical interaction taxonomy, bus, or `XrUiInputAdapter`
 - the home of the native 2D bridge path
 - the owner of shared cross-provider spatial helpers
 - the owner of scene-specific XR rig setup or proof-host world-hit acquisition
-- a place to silently re-home consumer/proof composition glue
+- a proof-scene composition repo
 
 ## Repository details
 
-- **Type:** Spatial UI provider bootstrap
+- **Type:** Spatial UI provider package
 - **License:** Mozilla Public License 2.0 (MPL 2.0)
 - **Dependency truth:**
   - `aerobeat-input-core` owns the canonical UI interaction contract
@@ -51,7 +50,7 @@ It is **not** intended to become:
 
 ## Runtime files
 
-The current bootstrap surface lives under:
+The concrete provider surface lives under:
 
 - `src/providers/xr/aero_spatial_ui_xr_provider.gd`
 - `src/providers/xr/aero_spatial_ui_xr_provider_config.gd`
@@ -62,6 +61,7 @@ Key repo-local docs:
 
 - `docs/phase-1-boundary-freeze.md`
 - `docs/phase-2-xr-packet-stack.md`
+- `docs/phase-3-first-xr-provider-extraction.md`
 
 ## GodotEnv development flow
 
@@ -114,7 +114,9 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
 ## Validation notes
 
 - `.testbed/addons.jsonc` is the committed dev/test dependency manifest.
-- `docs/phase-1-boundary-freeze.md` records the frozen ownership line for the XR lane.
-- `docs/phase-2-xr-packet-stack.md` records the bootstrap, extraction, and semantic packet truth for future implementation work.
-- The current XR lane remains **bootstrap-only** and should continue to report XR verification truth as `unverified` until real runtime/device validation exists upstream.
-- Consumer/proof hosts must continue owning scene-specific XR rig wiring and world-hit acquisition until a later extraction slice moves only the provider-owned XR lifecycle/runtime lane into this package.
+- `docs/phase-1-boundary-freeze.md` records the ownership line.
+- `docs/phase-2-xr-packet-stack.md` records the packet-stack source-of-truth that drove this extraction.
+- `docs/phase-3-first-xr-provider-extraction.md` records the extracted seam and parity truth.
+- Provider-local tests pin semantic goals such as owner continuity, drag ordering, cancel handling, source-variant stability, runtime state, and dependency truth.
+- `source_type == "xr"`, `source_variant == "xr_ray" | "xr_direct"`, `surface_type == "world_3d"`, and `verification_status == "unverified"` remain required runtime truth.
+- Consumer proof in `aerobeat-ui-kit-community` remains mandatory downstream.

@@ -2,9 +2,9 @@
 
 Date: 2026-05-23
 
-This note defines the **XR packet stack** for `aerobeat-spatial-ui-xr` using the now-proven touch packet lane as the planning pattern.
+This note defines the **XR packet stack** that guided the first runtime extraction for `aerobeat-spatial-ui-xr`.
 
-It is intentionally a planning artifact only. It does **not** implement XR provider runtime behavior.
+It remains the planning/source-of-truth packet for scope and parity. The concrete extracted seam that implemented this plan is recorded separately in `docs/phase-3-first-xr-provider-extraction.md`.
 
 ## Packet stack summary
 
@@ -19,7 +19,7 @@ That packet order is the important decision. It keeps the XR lane aligned with t
 
 - `aerobeat-input-core` keeps the canonical UI interaction contract and `XrUiInputAdapter`
 - `aerobeat-spatial-ui-core` keeps shared spatial helper ownership
-- `aerobeat-spatial-ui-xr` should own only XR-specific provider lifecycle/runtime behavior
+- `aerobeat-spatial-ui-xr` owns only XR-specific provider lifecycle/runtime behavior
 - consumer/proof repos keep scene-specific world-hit acquisition, XR rig wiring, authored proof composition, and installed-addon downstream proof
 
 ## 1. XR readiness packet
@@ -158,106 +158,15 @@ In the future consumer/proof repo that adopts the packaged XR lane:
 
 ## 4. Repo bootstrap packet
 
-This repo currently still reads as the generic adapter template in key places.
-That is acceptable as a starting point, but the first implementation lane should begin with an **XR bootstrap pass** before runtime extraction.
+This repo completed the XR bootstrap pass before runtime extraction started.
 
-### Bootstrap expectations for `aerobeat-spatial-ui-xr`
-
-#### Package identity
-
-Update repo identity files so they truthfully name the XR lane:
-
-- `README.md`
-- `plugin.cfg`
-- `docs/phase-1-boundary-freeze.md`
-
-Expected package truth:
-
-- concrete repo name: `aerobeat-spatial-ui-xr`
-- provider lane: XR
-- contract owner: `aerobeat-input-core`
-- shared helper owner: `aerobeat-spatial-ui-core`
-
-#### Runtime boundary files to create
-
-Under `src/providers/xr/`:
-
-- `aero_spatial_ui_xr_provider.gd`
-- `aero_spatial_ui_xr_provider_config.gd`
-- `aero_spatial_ui_xr_runtime_boundary.gd`
-- `aero_spatial_ui_xr_manifest.gd`
-
-These may begin as inert boundary/ownership scaffolding, but they should exist before claiming extraction work has started.
-
-#### Docs to create/update
-
-- `docs/phase-1-boundary-freeze.md` — retheme from template wording to XR lane wording
-- `docs/phase-2-xr-packet-stack.md` — this packet note
-- `docs/phase-3-first-xr-provider-extraction.md` — create once implementation planning turns into real extraction work
-
-#### Testbed expectations
-
-Keep `.testbed/addons.jsonc` pinned to:
-
-- `aerobeat-input-core`
-- `aerobeat-spatial-ui-core`
-- `gut`
-
-and add XR-specific test files named up front even if they start as scaffolds.
-
-## Recommended implementation order after packet definition
-
-1. **Bootstrap the repo identity**
-   - retheme README/plugin/boundary doc from template wording to XR provider wording
-   - add `src/providers/xr/` boundary files and manifest scaffolding
-
-2. **Freeze the XR runtime boundary**
-   - document exact non-goals, dependencies, and extracted-slice expectations in `aero_spatial_ui_xr_runtime_boundary.gd`
-   - keep ownership explicit before any runtime logic lands
-
-3. **Scaffold semantic tests before provider behavior**
-   - add the XR provider test names and dependency-boundary test
-   - keep them aligned with contract truth and `unverified` XR verification status
-
-4. **Define the first consumer adoption target**
-   - choose the proof host that will supply XR rig/world-hit acquisition
-   - explicitly keep those seams out of this repo
-
-5. **Implement the first XR provider extraction slice**
-   - only after bootstrap + test packet are in place
-   - start with XR lifecycle/runtime state and adapter composition
-   - do not move scene-specific XR rig/world-hit ownership into the provider repo
-
-6. **Add downstream installed-addon proof**
-   - prove the packaged XR addon is the code path actually exercised in the consumer host
+The remaining value of this section is historical: it records the minimum boundary/docs/tests/package shape that had to exist before runtime work began.
 
 ## Bottom line
 
-The XR packet stack is now defined:
+The XR packet stack is now defined and exercised:
 
 - **readiness:** ready for XR-lane extraction planning
 - **first extraction:** move XR lifecycle/runtime semantics only
 - **parity/tests:** require contract, lifecycle, and structure checks before claiming success
-- **bootstrap:** retheme this repo from template identity into a concrete XR provider lane before implementation
-
-That keeps XR aligned with the spatial-ui family pattern already proved by the mouse lane and formalized by the touch packets.
-
-## Files inspected for this note
-
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-ui-kit-community/docs/notes/2026-05-23-phase-5-touch-provider-readiness.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-ui-kit-community/docs/notes/2026-05-23-phase-5-touch-provider-first-extraction-packet.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-ui-kit-community/docs/notes/2026-05-23-phase-5-touch-provider-parity-test-packet.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-ui-kit-community/docs/notes/2026-05-23-phase-5-touch-provider-bootstrap-packet.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-xr/README.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-xr/docs/phase-1-boundary-freeze.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-xr/plugin.cfg`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-xr/.testbed/addons.jsonc`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-mouse/README.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-mouse/src/providers/mouse/aero_spatial_ui_mouse_runtime_boundary.gd`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-spatial-ui/README.md`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-template-spatial-ui/src/template/aero_spatial_ui_adapter_template_manifest.gd`
-- `/home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-input-core/docs/ui-interaction-contract-v1.md`
-
-## Files touched for this note
-
-- `docs/phase-2-xr-packet-stack.md`
+- **bootstrap:** establish the truthful repo boundary before implementation

@@ -1,54 +1,47 @@
 # Phase 1 Boundary Freeze
 
-This repo is frozen as the **XR provider-lane bootstrap for AeroBeat spatial UI**.
+This repo is now frozen as the **XR-driven spatial UI provider lane** in the AeroBeat spatial UI family.
 
-The bootstrap boundary should now be read through the XR packet-stack truth:
+## What this repo owns
 
-- `aerobeat-input-core` owns the canonical interaction contract and the upstream `XrUiInputAdapter` contract surface
-- `aerobeat-spatial-ui-core` owns the shared packaged helper/provider-support layer
-- `aerobeat-spatial-ui-xr` owns only the XR provider lane and its future lifecycle/runtime extraction work
-- consumer/proof repos keep scene-specific XR rig wiring, world-hit acquisition, authored proof composition, and installed-addon adoption until later extraction packets land
+`aerobeat-spatial-ui-xr` is the home of the concrete provider layer for XR interaction on projected/world-space UI surfaces.
 
-## What this repo is allowed to own
+That XR provider lane owns:
 
-This bootstrap repo is the place where XR-provider work may grow into:
+- XR pointer lifecycle/runtime state for spatial UI hosts
+- XR press ownership, drag ownership, and release continuity for projected spatial surfaces
+- source-variant continuity for `xr_ray` and `xr_direct`
+- off-surface continuation using prior projected state when continuity exists
+- explicit XR cancel publication policy
+- provider-readable runtime diagnostics for XR semantics
 
-- XR-specific package identity and docs
-- dependency truth pointing to `aerobeat-input-core` as the contract owner
-- dependency truth pointing to `aerobeat-spatial-ui-core` as the shared helper-layer owner
-- inert provider/config/runtime/manifest scaffolding for the XR lane
-- future XR pointer lifecycle/runtime state
-- future XR interaction-mode normalization for `xr_ray` and `xr_direct`
-- future provider-readable runtime diagnostics for downstream proof and QA flows
-- future adapter composition into the existing canonical contract
+## What this repo does **not** own
 
-## What this repo is not allowed to own
-
-This bootstrap repo must not claim XR implementation completion before the provider slice is actually extracted, and it must not redefine the AeroBeat UI interaction contract.
+This boundary explicitly prevents the repo from drifting into other ownership lanes.
 
 It does **not** own:
 
-- canonical contract event types
-- the interaction bus
+- the canonical interaction contract
+- event taxonomy, event classes, or the interaction bus
 - `XrUiInputAdapter` contract semantics
-- native 2D bridge logic
-- shared cross-provider helper-layer ownership
-- scene-specific XR rig setup
-- proof-host world-hit acquisition ownership
-- proof-scene debug HUD composition
-- consumer/proof compatibility-wrapper glue
+- the native 2D bridge path
+- shared cross-provider spatial helper ownership
+- proof-host XR rig wiring or world-hit acquisition from consumer repos
+- scene-specific proof-host composition from consumer repos
 
-Those concerns stay in their owning repos:
+## Dependency truth
 
-- `aerobeat-input-core` owns the canonical interaction contract and native 2D bridge path
-- `aerobeat-spatial-ui-core` owns shared helper scaffolding used by concrete provider repos
-- `aerobeat-spatial-ui-xr` should eventually own XR lifecycle/runtime semantics only
-- consumer/proof repos keep XR rig/world-hit/composition seams until a later packet explicitly extracts them
+This repo sits on top of:
 
-## Why placeholder runtime classes exist here
+- `aerobeat-input-core` — canonical contract owner
+- `aerobeat-spatial-ui-core` — shared helper-layer owner
 
-The placeholder XR runtime classes in this repo are intentionally inert. They exist so the XR lane begins from a truthful package boundary instead of continuing to masquerade as the generic adapter template.
+Those dependencies are represented in `.testbed/addons.jsonc`, while the runtime provider files under `src/providers/xr/` establish the concrete XR-lane boundary.
 
-If future work needs real XR lifecycle publication, owner/capture continuity, cancel semantics, or runtime diagnostics backed by live provider state, that work belongs in a later extraction slice inside this repo rather than in this bootstrap pass.
+## Phase progression
 
-If a consumer/proof repo still contains XR rig helpers, raycast ownership, or authored world-target composition, keep those seams local there until the relevant extraction packet explicitly moves XR provider ownership into this package.
+- **Phase 1:** boundary freeze and truthful bootstrap scaffolding
+- **Phase 2:** XR packet stack / extraction plan
+- **Phase 3:** first real extracted XR-provider slice
+
+The extraction result lives in `docs/phase-3-first-xr-provider-extraction.md`. That slice moves reusable XR lifecycle/runtime semantics only, while keeping XR rig wiring, world-hit acquisition, proof-scene composition, and canonical contract ownership outside this repo.

@@ -1,10 +1,10 @@
 {
   "$schema": "https://chickensoft.games/schemas/addons.schema.json",
   "addons": {
-    // Canonical shared UI interaction contract for the XR provider lane bootstrap.
+    // Canonical shared UI interaction contract for the XR provider runtime lane.
     "aerobeat-input-core": {
       "url": "git@github.com:AeroBeat-Workouts/aerobeat-input-core.git",
-      "checkout": "v0.1.0",
+      "checkout": "main",
       "subfolder": "/"
     },
     // Shared helper layer consumed by concrete spatial provider repos, including XR.
