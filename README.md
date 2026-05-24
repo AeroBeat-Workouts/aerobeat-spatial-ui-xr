@@ -9,14 +9,15 @@ This package now owns the first truthful extracted slice of reusable XR lifecycl
 This repository now contains:
 
 - concrete XR provider runtime behavior under `src/providers/xr/`
+- a provider-owned human verification harness under `.testbed/scenes/xr_provider_verification_harness.tscn`
 - boundary docs that freeze repo ownership for XR lifecycle/runtime semantics only
 - package/runtime manifests that pin dependency and non-goal truth
-- provider-local semantic tests for press/release, drag ordering, cancel handling, runtime state, and dependency boundaries
+- provider-local semantic tests for press/release, drag ordering, cancel handling, runtime state, harness truth, and dependency boundaries
 - a `.testbed/` workbench manifest that points at the canonical contract and shared helper owners
 
 The current implementation is intentionally narrow:
 
-- **included now:** XR lifecycle/runtime semantics, source-variant stability (`xr_ray` / `xr_direct`), owner continuity, off-surface release continuation, cancel publication policy, provider runtime diagnostics, and packaged shared-helper composition
+- **included now:** XR lifecycle/runtime semantics, source-variant stability (`xr_ray` / `xr_direct`), owner continuity, off-surface release continuation, cancel publication policy, provider runtime diagnostics, the provider-owned human harness, and packaged shared-helper composition
 - **still intentionally excluded:** XR rig wiring, world-hit acquisition, proof-host composition/debug UI, canonical contract ownership, and shared helper ownership changes
 
 ## Planned responsibility boundary
@@ -91,6 +92,13 @@ From the repo root:
 ```bash
 godot --editor --path .testbed
 ```
+
+Then open `.testbed/scenes/xr_provider_verification_harness.tscn` inside the hidden workbench to verify that:
+
+- the active runtime seam is `AeroSpatialUiXrProvider`
+- normalized events still publish `source_variant`, `phase`, `target_path`, and `verification_status` through the canonical contract path
+- runtime state truth shows owner/live target continuity, release-outside truth, and interruption-only cancel behavior
+- the repo is still not re-owning XR rig wiring, world-hit acquisition, or downstream proof-host composition
 
 ### Import smoke check
 
