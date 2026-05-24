@@ -45,6 +45,17 @@ func test_runtime_state_reports_owner_hover_and_manifest_truth() -> void:
 	assert_eq(str(raw_metadata.get("target_resolution", "")), "rect_target_specs")
 	assert_eq(str(raw_metadata.get("source_variant", "")), "xr_ray")
 
+	var interaction_summary: Dictionary = provider.describe_interaction_summary()
+	assert_true(bool(interaction_summary.get("is_xr_active", false)))
+	assert_eq(str(interaction_summary.get("preferred_target_label", "")), "PrimaryActionButton")
+	assert_eq(str(interaction_summary.get("owner_target_label", "")), "PrimaryActionButton")
+	assert_eq(str(interaction_summary.get("live_target_label", "")), "SecondaryActionButton")
+	assert_eq(str(interaction_summary.get("state_phase", "")), "drag_begin")
+	assert_eq(str(interaction_summary.get("locked_source_variant", "")), "xr_ray")
+	assert_eq(str(interaction_summary.get("active_button", "")), "trigger")
+	assert_eq(str(interaction_summary.get("last_terminal_result", "not-empty")), "")
+	assert_eq(str(interaction_summary.get("verification_status", "")), "unverified")
+
 	var summary: Dictionary = MANIFEST_SCRIPT.ownership_summary()
 	assert_true(summary.get("implements_xr_runtime_behavior", false))
 	assert_true(summary.get("supported_source_variants", PackedStringArray()).has("xr_ray"))

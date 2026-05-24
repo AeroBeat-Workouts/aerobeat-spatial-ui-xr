@@ -26,7 +26,8 @@ func test_cancel_and_entry_policy_match_first_extraction_truth() -> void:
 		adapter,
 		surface,
 		harness.make_cancel("xr_right", "xr_direct"),
-		harness.build_off_surface_hit(Vector2(205.0, 205.0))
+		harness.build_off_surface_hit(Vector2(205.0, 205.0)),
+		{"interruption_reason": "tracking_lost"}
 	))
 	assert_eq(harness.event_phases(events), ["press_begin", "cancel"])
 	assert_eq(str(events[1].target_path), "Root/PrimaryActionButton")
@@ -35,6 +36,15 @@ func test_cancel_and_entry_policy_match_first_extraction_truth() -> void:
 	var state: Dictionary = provider.describe_runtime_state()
 	assert_eq(int(state.get("active_pointer_count", -1)), 0)
 	assert_eq(str(state.get("last_published_phase", "")), "cancel")
+	assert_eq(str(state.get("last_terminal_result", "")), "cancel")
+	assert_eq(str(state.get("last_interruption_reason", "")), "tracking_lost")
+
+	var summary: Dictionary = provider.describe_interaction_summary()
+	assert_false(bool(summary.get("is_xr_active", true)))
+	assert_eq(str(summary.get("last_terminal_result", "")), "cancel")
+	assert_eq(str(summary.get("last_interruption_reason", "")), "tracking_lost")
+	assert_eq(str(summary.get("last_release_target_path", "not-empty")), "")
+	assert_string_contains(str(summary.get("last_forwarded_panel_event", "")), "tracking_lost")
 
 	var extracted_slice: Dictionary = RUNTIME_BOUNDARY.describe_extracted_slice()
 	assert_true(extracted_slice.get("owns_xr_lifecycle_runtime_state", false))

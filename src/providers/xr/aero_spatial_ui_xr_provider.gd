@@ -36,6 +36,8 @@ var _last_published_phase := ""
 var _last_pointer_id: StringName = StringName()
 var _last_source_variant: StringName = StringName()
 var _last_button: StringName = StringName()
+var _last_terminal_result := ""
+var _last_interruption_reason := ""
 
 func _init(config = null) -> void:
 	_target_resolver = _build_target_resolver()
@@ -87,6 +89,7 @@ func describe_runtime_state() -> Dictionary:
 		"active_live_target_path": owner_summary.get("live_target_path", NodePath()),
 		"active_drag_started": owner_summary.get("drag_started", false),
 		"active_source_variant": owner_summary.get("source_variant", ""),
+		"active_button": owner_summary.get("button", ""),
 		"has_active_owner": owner_summary.get("has_active_owner", false),
 		"has_active_live_target": owner_summary.get("has_active_live_target", false),
 		"last_pointer_id": _last_pointer_id,
@@ -96,8 +99,48 @@ func describe_runtime_state() -> Dictionary:
 		"last_live_target_path": _last_live_target_path,
 		"last_surface_hover_hit": _last_surface_hover_hit,
 		"last_release_target_path": _last_release_target_path,
+		"last_terminal_result": _last_terminal_result,
+		"last_interruption_reason": _last_interruption_reason,
 		"last_forwarded_panel_event": _last_forwarded_panel_event,
 		"last_projected_data": _last_projected_data.duplicate(true),
+	}
+
+func describe_interaction_summary() -> Dictionary:
+	var owner_summary := _describe_active_owner_state()
+	var owner_target_path: NodePath = owner_summary.get("owner_target_path", NodePath())
+	var live_target_path: NodePath = owner_summary.get("live_target_path", NodePath())
+	if live_target_path == NodePath() and _last_surface_hover_hit:
+		live_target_path = _last_live_target_path
+	var preferred_target_path: NodePath = owner_target_path if owner_target_path != NodePath() else live_target_path
+	var has_active_pointer := not _active_pointer_state.is_empty()
+	var active_phase: String = _last_published_phase if has_active_pointer else ""
+	var locked_source_variant := str(owner_summary.get("source_variant", ""))
+	if locked_source_variant == "":
+		locked_source_variant = str(_last_source_variant)
+	var active_button := str(owner_summary.get("button", ""))
+	if active_button == "":
+		active_button = str(_last_button)
+	return {
+		"is_xr_active": has_active_pointer,
+		"active_pointer_count": _active_pointer_state.size(),
+		"active_pointer_id": owner_summary.get("pointer_id", ""),
+		"preferred_target_path": preferred_target_path,
+		"preferred_target_label": _path_label(preferred_target_path),
+		"owner_target_path": owner_target_path,
+		"owner_target_label": _path_label(owner_target_path),
+		"live_target_path": live_target_path,
+		"live_target_label": _path_label(live_target_path),
+		"state_phase": active_phase,
+		"locked_source_variant": locked_source_variant,
+		"active_button": active_button,
+		"has_active_owner": owner_summary.get("has_active_owner", false),
+		"has_active_live_target": owner_summary.get("has_active_live_target", false) or (live_target_path != NodePath()),
+		"last_release_target_path": _last_release_target_path,
+		"last_release_target_label": _path_label(_last_release_target_path),
+		"last_terminal_result": _last_terminal_result,
+		"last_interruption_reason": _last_interruption_reason,
+		"last_forwarded_panel_event": _last_forwarded_panel_event,
+		"verification_status": "unverified",
 	}
 
 func reset_runtime_state() -> void:
@@ -111,6 +154,8 @@ func reset_runtime_state() -> void:
 	_last_pointer_id = StringName()
 	_last_source_variant = StringName()
 	_last_button = StringName()
+	_last_terminal_result = ""
+	_last_interruption_reason = ""
 
 func resolve_target_for_hit(surface, projected_hit: Dictionary) -> Dictionary:
 	return _resolve_target_for_hit(surface, projected_hit)
@@ -166,6 +211,7 @@ func publish_pointer_update(
 	if bool(pointer_update.get("canceled", false)):
 		if previous_projected.is_empty():
 			return false
+		var interruption_reason := _resolve_interruption_reason(pointer_update, context, raw_metadata)
 		_publish_pointer_phase(adapter, INTERACTION_TYPES.PHASE_CANCEL, pointer_id, previous_projected, {
 			"source_variant": source_variant,
 			"button": button,
@@ -177,7 +223,12 @@ func publish_pointer_update(
 		_active_pointer_state.erase(pointer_id)
 		_last_projected_data = previous_projected.duplicate(true)
 		_last_published_phase = str(INTERACTION_TYPES.PHASE_CANCEL)
+		_last_release_target_path = ""
+		_last_terminal_result = "cancel"
+		_last_interruption_reason = interruption_reason
 		_last_forwarded_panel_event = "publish xr cancel %s (%s)" % [str(pointer_id), str(source_variant)]
+		if interruption_reason != "":
+			_last_forwarded_panel_event += " • reason %s" % interruption_reason
 		return true
 
 	var pressed := bool(pointer_update.get("pressed", false))
@@ -190,7 +241,22 @@ func publish_pointer_update(
 
 	if previous_state.is_empty():
 		if not pressed:
-			return false
+			if has_hit and live_target_path != NodePath():
+				_last_projected_data = _build_projected_data(
+					surface,
+					projected_hit,
+					previous_projected,
+					NodePath(),
+					live_target_path,
+					resolution_metadata,
+					context
+				)
+				_last_forwarded_panel_event = "observe xr hover %s (%s) -> %s" % [str(pointer_id), str(source_variant), _path_label(live_target_path)]
+			else:
+				_last_projected_data = {}
+				_last_forwarded_panel_event = "observe xr hover %s (%s) -> none" % [str(pointer_id), str(source_variant)]
+			_last_published_phase = ""
+			return has_hit
 		if not has_hit or live_target_path == NodePath():
 			return false
 		var press_projected_data := _build_projected_data(
@@ -292,6 +358,8 @@ func publish_pointer_update(
 	_last_projected_data = projected_data.duplicate(true)
 	_last_published_phase = str(INTERACTION_TYPES.PHASE_PRESS_END)
 	_last_release_target_path = str(projected_data.get("target_path", NodePath()))
+	_last_terminal_result = "release"
+	_last_interruption_reason = ""
 	_last_forwarded_panel_event = "publish xr release %s (%s) -> %s" % [
 		str(pointer_id),
 		str(source_variant),
@@ -317,6 +385,7 @@ func _describe_active_owner_state() -> Dictionary:
 			"live_target_path": NodePath(),
 			"drag_started": false,
 			"source_variant": "",
+			"button": "",
 			"has_active_owner": false,
 			"has_active_live_target": false,
 		}
@@ -330,6 +399,7 @@ func _describe_active_owner_state() -> Dictionary:
 		"live_target_path": live_target_path,
 		"drag_started": bool(pointer_state.get("drag_started", false)),
 		"source_variant": str(pointer_state.get("source_variant", "")),
+		"button": str(pointer_state.get("button", "")),
 		"has_active_owner": owner_target_path != NodePath(),
 		"has_active_live_target": live_target_path != NodePath(),
 	}
@@ -402,6 +472,16 @@ func _resolve_button(pointer_update: Dictionary, previous_state: Dictionary) -> 
 		return StringName(previous_state.get("button", DEFAULT_BUTTON))
 	var candidate := StringName(pointer_update.get("button", DEFAULT_BUTTON))
 	return candidate if INTERACTION_TYPES.is_valid_button(candidate) else DEFAULT_BUTTON
+
+func _resolve_interruption_reason(pointer_update: Dictionary, context: Dictionary, raw_metadata: Dictionary) -> String:
+	for key in ["interruption_reason", "cancel_reason", "reason"]:
+		if pointer_update.has(key):
+			return str(pointer_update.get(key, ""))
+		if context.has(key):
+			return str(context.get(key, ""))
+		if raw_metadata.has(key):
+			return str(raw_metadata.get(key, ""))
+	return ""
 
 func _resolve_host_surface(surface, context: Dictionary) -> String:
 	if context.has("host_surface"):
