@@ -85,6 +85,17 @@ cd .testbed
 godotenv addons install
 ```
 
+This bootstrap step now restores both:
+
+- external dependencies (`aerobeat-input-core`, `aerobeat-spatial-ui-core`, `gut`)
+- this repo's own package mount under `res://addons/aerobeat-spatial-ui-xr/` via the local-root GodotEnv symlink entry in `.testbed/addons.jsonc`
+
+If you want the canonical workspace refresh path instead of calling `godotenv` directly, run:
+
+```bash
+/home/derrick/.openclaw/workspace/scripts/godotenv-sync --repo /home/derrick/.openclaw/workspace/projects/aerobeat/aerobeat-spatial-ui-xr/.testbed
+```
+
 ### Open the workbench
 
 From the repo root:
@@ -121,7 +132,7 @@ godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
 
 ## Validation notes
 
-- `.testbed/addons.jsonc` is the committed dev/test dependency manifest.
+- `.testbed/addons.jsonc` is the committed dev/test dependency manifest, including the repo's own local-root self-mount entry for `aerobeat-spatial-ui-xr`.
 - `docs/phase-1-boundary-freeze.md` records the ownership line.
 - `docs/phase-2-xr-packet-stack.md` records the packet-stack source-of-truth that drove this extraction.
 - `docs/phase-3-first-xr-provider-extraction.md` records the extracted seam and parity truth.
