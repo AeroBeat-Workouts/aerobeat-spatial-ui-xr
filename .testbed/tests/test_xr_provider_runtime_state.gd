@@ -1,7 +1,8 @@
 extends GutTest
 
 const HARNESS_SCRIPT := preload("res://tests/support/xr_provider_test_harness.gd")
-const MANIFEST_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_manifest.gd")
+const INSTALLED_XR_PACKAGE_ROOT := "res://addons/aerobeat-spatial-ui-xr"
+const MANIFEST_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_manifest.gd"
 
 func test_runtime_state_reports_owner_hover_and_manifest_truth() -> void:
 	var harness = HARNESS_SCRIPT.new()
@@ -56,7 +57,7 @@ func test_runtime_state_reports_owner_hover_and_manifest_truth() -> void:
 	assert_eq(str(interaction_summary.get("last_terminal_result", "not-empty")), "")
 	assert_eq(str(interaction_summary.get("verification_status", "")), "unverified")
 
-	var summary: Dictionary = MANIFEST_SCRIPT.ownership_summary()
+	var summary: Dictionary = load(MANIFEST_SCRIPT_PATH).ownership_summary()
 	assert_true(summary.get("implements_xr_runtime_behavior", false))
 	assert_true(summary.get("supported_source_variants", PackedStringArray()).has("xr_ray"))
 	assert_true(summary.get("supported_source_variants", PackedStringArray()).has("xr_direct"))

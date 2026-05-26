@@ -119,6 +119,16 @@ From the repo root:
 godot --headless --path .testbed --import
 ```
 
+### Installed-addon packaged-path smoke check
+
+From the repo root:
+
+```bash
+godot --headless --path .testbed --script res://scripts/validate_installed_addon_paths.gd
+```
+
+This runs a minimal XR publish/target-resolution proof directly through `res://addons/aerobeat-spatial-ui-xr/...` so the hidden testbed validates the installed package path instead of falling back to `res://../src/...`.
+
 ### Run unit tests
 
 From the repo root:

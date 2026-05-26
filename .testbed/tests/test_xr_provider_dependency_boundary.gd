@@ -1,13 +1,14 @@
 extends GutTest
 
-const MANIFEST_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_manifest.gd")
-const PROVIDER_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_provider.gd")
-const CONFIG_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_provider_config.gd")
-const RUNTIME_BOUNDARY_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_runtime_boundary.gd")
+const INSTALLED_XR_PACKAGE_ROOT := "res://addons/aerobeat-spatial-ui-xr"
+const MANIFEST_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_manifest.gd"
+const PROVIDER_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_provider.gd"
+const CONFIG_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_provider_config.gd"
+const RUNTIME_BOUNDARY_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_runtime_boundary.gd"
 const README_PATH := "res://../README.md"
 
 func test_xr_manifest_locks_dependency_truth_and_runtime_ownership() -> void:
-	var summary := MANIFEST_SCRIPT.ownership_summary()
+	var summary: Dictionary = load(MANIFEST_SCRIPT_PATH).ownership_summary()
 
 	assert_eq(summary.get("repo_role"), "xr_provider_runtime")
 	assert_eq(summary.get("provider_lane"), "xr")
@@ -27,11 +28,11 @@ func test_xr_manifest_locks_dependency_truth_and_runtime_ownership() -> void:
 	assert_false(summary.get("owns_world_hit_acquisition", true))
 
 func test_xr_runtime_boundary_and_config_keep_existing_owners_and_non_goals() -> void:
-	var provider = PROVIDER_SCRIPT.new()
-	var config = CONFIG_SCRIPT.new()
-	var boundary := provider.describe_boundary()
-	var snapshot := config.to_boundary_snapshot()
-	var dependencies := RUNTIME_BOUNDARY_SCRIPT.describe_dependencies()
+	var provider = load(PROVIDER_SCRIPT_PATH).new()
+	var config = load(CONFIG_SCRIPT_PATH).new()
+	var boundary: Dictionary = provider.describe_boundary()
+	var snapshot: Dictionary = config.to_boundary_snapshot()
+	var dependencies: Dictionary = load(RUNTIME_BOUNDARY_SCRIPT_PATH).describe_dependencies()
 
 	assert_true(boundary.get("implements_runtime_behavior", false))
 	assert_true(boundary.get("owns_xr_provider_runtime", false))
@@ -58,7 +59,7 @@ func test_xr_runtime_boundary_and_config_keep_existing_owners_and_non_goals() ->
 	assert_true(helper_expectations.has("AeroSpatialProjectionHelper"))
 	assert_true(helper_expectations.has("AeroSpatialRectTargetResolver"))
 
-	var non_goals: PackedStringArray = RUNTIME_BOUNDARY_SCRIPT.describe_non_goals()
+	var non_goals: PackedStringArray = load(RUNTIME_BOUNDARY_SCRIPT_PATH).describe_non_goals()
 	assert_true(non_goals.has("no canonical interaction contract types"))
 	assert_true(non_goals.has("no native 2D bridge logic"))
 	assert_true(non_goals.has("no shared helper-layer ownership"))

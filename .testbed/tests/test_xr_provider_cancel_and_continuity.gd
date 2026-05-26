@@ -1,7 +1,8 @@
 extends GutTest
 
 const HARNESS_SCRIPT := preload("res://tests/support/xr_provider_test_harness.gd")
-const RUNTIME_BOUNDARY := preload("res://../src/providers/xr/aero_spatial_ui_xr_runtime_boundary.gd")
+const INSTALLED_XR_PACKAGE_ROOT := "res://addons/aerobeat-spatial-ui-xr"
+const RUNTIME_BOUNDARY_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_runtime_boundary.gd"
 
 func test_cancel_and_entry_policy_match_first_extraction_truth() -> void:
 	var harness = HARNESS_SCRIPT.new()
@@ -46,7 +47,7 @@ func test_cancel_and_entry_policy_match_first_extraction_truth() -> void:
 	assert_eq(str(summary.get("last_release_target_path", "not-empty")), "")
 	assert_string_contains(str(summary.get("last_forwarded_panel_event", "")), "tracking_lost")
 
-	var extracted_slice: Dictionary = RUNTIME_BOUNDARY.describe_extracted_slice()
+	var extracted_slice: Dictionary = load(RUNTIME_BOUNDARY_PATH).describe_extracted_slice()
 	assert_true(extracted_slice.get("owns_xr_lifecycle_runtime_state", false))
 	assert_true(extracted_slice.get("owns_xr_publish_policy", false))
 	assert_true(extracted_slice.get("owns_cancel_policy", false))

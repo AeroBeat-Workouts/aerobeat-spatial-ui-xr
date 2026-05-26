@@ -4,9 +4,10 @@ const BUS_SCRIPT := preload("res://addons/aerobeat-input-core/src/ui/ui_interact
 const ADAPTER_SCRIPT := preload("res://addons/aerobeat-input-core/src/ui/adapters/xr_ui_input_adapter.gd")
 const SURFACE_DESCRIPTOR_SCRIPT := preload("res://addons/aerobeat-spatial-ui-core/src/helpers/surfaces/aero_spatial_surface_descriptor.gd")
 const PROJECTION_HELPER_SCRIPT := preload("res://addons/aerobeat-spatial-ui-core/src/helpers/providers/aero_spatial_projection_helper.gd")
-const PROVIDER_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_provider.gd")
-const CONFIG_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_provider_config.gd")
-const MANIFEST_SCRIPT := preload("res://../src/providers/xr/aero_spatial_ui_xr_manifest.gd")
+const INSTALLED_XR_PACKAGE_ROOT := "res://addons/aerobeat-spatial-ui-xr"
+const PROVIDER_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_provider.gd"
+const CONFIG_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_provider_config.gd"
+const MANIFEST_SCRIPT_PATH := INSTALLED_XR_PACKAGE_ROOT + "/src/providers/xr/aero_spatial_ui_xr_manifest.gd"
 
 const SURFACE_ID: StringName = &"xr_world_ui"
 const DEFAULT_SOURCE_VARIANT: StringName = &"xr_ray"
@@ -45,11 +46,11 @@ func attach_runtime(host: Node, threshold := 12.0) -> Dictionary:
 	var events: Array = []
 	bus.interaction_event.connect(func(event): events.append(event))
 
-	var config = CONFIG_SCRIPT.new()
+	var config = load(CONFIG_SCRIPT_PATH).new()
 	config.drag_threshold_pixels = threshold
 	config.host_surface = "WorldUiPanel"
 	config.target_resolution = "rect_target_specs"
-	var provider = PROVIDER_SCRIPT.new(config)
+	var provider = load(PROVIDER_SCRIPT_PATH).new(config)
 	return {
 		"host": host,
 		"bus": bus,
@@ -132,7 +133,7 @@ func describe_snapshot(runtime: Dictionary, last_event = null, source_variant: S
 	var bus = runtime.get("bus", null)
 	var runtime_state: Dictionary = provider.describe_runtime_state() if provider != null else {}
 	var interaction_summary: Dictionary = provider.describe_interaction_summary() if provider != null else {}
-	var manifest: Dictionary = MANIFEST_SCRIPT.ownership_summary()
+	var manifest: Dictionary = load(MANIFEST_SCRIPT_PATH).ownership_summary()
 	var effective_source_variant: StringName = source_variant
 	if last_event != null:
 		effective_source_variant = StringName(last_event.source_variant)
