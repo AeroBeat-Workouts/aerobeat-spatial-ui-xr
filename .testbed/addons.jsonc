@@ -1,25 +1,26 @@
 {
   "$schema": "https://chickensoft.games/schemas/addons.schema.json",
   "addons": {
-    // Mount the current repo package from the repo root so the hidden testbed stages the installed addon path deterministically.
     "aerobeat-spatial-ui-xr": {
       "url": "..",
       "source": "symlink",
       "subfolder": "/"
     },
-    // Canonical shared UI interaction contract for the XR provider runtime lane.
     "aerobeat-input-core": {
-      "url": "git@github.com:AeroBeat-Workouts/aerobeat-input-core.git",
-      "checkout": "main",
-      "subfolder": "/"
+      "url": "../../aerobeat-input-core",
+      "subfolder": "/",
+      "source": "symlink"
     },
-    // Shared helper layer consumed by concrete spatial provider repos, including XR.
     "aerobeat-spatial-ui-core": {
-      "url": "git@github.com:AeroBeat-Workouts/aerobeat-spatial-ui-core.git",
-      "checkout": "main",
-      "subfolder": "/"
+      "url": "../../aerobeat-spatial-ui-core",
+      "subfolder": "/",
+      "source": "symlink"
     },
-    // GUT drives the repo-local bootstrap test suite inside the hidden testbed/workbench.
+    "aerobeat-tool-headless-manager": {
+      "url": "../../aerobeat-tool-headless-manager",
+      "subfolder": "/",
+      "source": "symlink"
+    },
     "gut": {
       "url": "git@github.com:bitwes/Gut.git",
       "checkout": "main",
