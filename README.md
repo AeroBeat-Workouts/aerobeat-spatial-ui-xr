@@ -47,7 +47,7 @@ It is **not** intended to become:
 - **Dependency truth:**
   - `aerobeat-input-core` owns the canonical UI interaction contract
   - `aerobeat-spatial-ui-core` owns shared spatial-provider helper scaffolding
-  - `gut` drives repo-local validation
+  - `aerobeat-vendor-godot-unit-test` drives repo-local validation
 
 ## Runtime files
 
@@ -87,7 +87,7 @@ godotenv addons install
 
 This bootstrap step now restores both:
 
-- external dependencies (`aerobeat-input-core`, `aerobeat-spatial-ui-core`, `gut`)
+- external dependencies (`aerobeat-input-core`, `aerobeat-spatial-ui-core`, `aerobeat-vendor-godot-unit-test`)
 - this repo's own package mount under `res://addons/aerobeat-spatial-ui-xr/` via the local-root GodotEnv symlink entry in `.testbed/addons.jsonc`
 
 If you want the canonical workspace refresh path instead of calling `godotenv` directly, run:
@@ -134,7 +134,7 @@ This runs a minimal XR publish/target-resolution proof directly through `res://a
 From the repo root:
 
 ```bash
-godot --headless --path .testbed --script addons/gut/gut_cmdln.gd \
+godot --headless --path .testbed --script addons/aerobeat-vendor-godot-unit-test/gut_cmdln.gd \
   -gdir=res://tests \
   -ginclude_subdirs \
   -gexit
